@@ -1,150 +1,147 @@
-import imaplib
-import email
-import json
-import mysql.connector
 import time
-import os
+import json
+import network
+from machine import Pin, I2C
+from bme680 import BME680_I2C
+from umail import SMTP
 
-# ============================
-# E-Mail Zugang (IServ-Schul-Mail)
-# ============================
-IMAP_SERVER = "DEIN_IMAP_SERVER"
-IMAP_PORT = 993
-EMAIL_ACCOUNT = "DEIN_EMAIL_ACCOUNT"
-EMAIL_PASSWORD = "DEIN_EMAIL_PASSWORT"
+# ===============================
+# Konfiguration
+# ===============================
+WIFI_SSID = "DEIN_WLAN_SSID"
+WIFI_PASSWORD = "DEIN_WLAN_PASSWORT"
+SENSOR_MID = 0  # eindeutige ID des Sensors
+EMAIL_ENABLED = True
+SMTP_SERVER = "DEIN_SMTP_SERVER"
+SMTP_PORT = 465  # Gmail SSL-Port
+SMTP_SENDER_EMAIL = "DEINE_EMAIL"
+SMTP_APP_PASSWORD = "DEIN_APP_PASSWORT"
+EMAIL_RECIPIENT = "EMPFÄNGER_EMAIL"
+EMAIL_SUBJECT = "Wetterstation BME680 JSON"
+CACHE_FILE = "cache.json"
 
-# ============================
-# MySQL Datenbank
-# ============================
-DB_HOST = "DEIN_DB_HOST"
-DB_USER = "DEIN_DB_USER"
-DB_PASSWORD = "DEIN_DB_PASSWORT"
-DB_NAME = "DEIN_DB_NAME"
-
-# ============================
-# Log-Ordner erstellen
-# ============================
-LOG_FOLDER = "logs"
-if not os.path.exists(LOG_FOLDER):
-    os.mkdir(LOG_FOLDER)
-
-# ============================
-# DB Verbindung herstellen
-# ============================
-def connect_db():
-    return mysql.connector.connect(
-        host=DB_HOST,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        database=DB_NAME,
-        autocommit=False
-    )
-
-conn = connect_db()
-cursor = conn.cursor()
-print("▶ Starte Mail → DB Service")
-
-# ============================
-# Logdatei schreiben
-# ============================
-def write_log(data):
-    log_file = os.path.join(LOG_FOLDER, f"log_mid_{data['mid']}.txt")
-    with open(log_file, "a") as f:
-        f.write(json.dumps(data) + "\n")
-
-# ============================
-# Endlosschleife
-# ============================
-while True:
+# ===============================
+# Hilfsfunktionen für den Cache
+# ===============================
+def load_cache():
     try:
-        mail = imaplib.IMAP4_SSL(IMAP_SERVER, IMAP_PORT)
-        mail.login(EMAIL_ACCOUNT, EMAIL_PASSWORD)
-        mail.select("inbox")
+        with open(CACHE_FILE, "r") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return []
 
-        status, messages = mail.search(None, '(UNSEEN)')
+def save_cache(data_list):
+    with open(CACHE_FILE, "w") as f:
+        json.dump(data_list, f)
 
-        if status == "OK" and messages[0] != b'':
-            for num in messages[0].split():
-                status, data = mail.fetch(num, "(RFC822)")
-                if status != "OK":
-                    continue
+def clear_cache():
+    save_cache([])
 
-                raw_email = data[0][1]
-                msg = email.message_from_bytes(raw_email)
+# ===============================
+# WLAN verbinden
+# ===============================
+def is_connected():
+    wlan = network.WLAN(network.STA_IF)
+    return wlan.isconnected()
 
-                # JSON aus Mail extrahieren
-                json_text = None
-                if msg.is_multipart():
-                    for part in msg.walk():
-                        if part.get_content_type() in ["application/json", "text/plain"]:
-                            payload = part.get_payload(decode=True)
-                            if payload:
-                                json_text = payload.decode(errors="ignore").strip()
-                                break
-                else:
-                    payload = msg.get_payload(decode=True)
-                    if payload:
-                        json_text = payload.decode(errors="ignore").strip()
+def connect_wlan():
+    wlan = network.WLAN(network.STA_IF)
+    wlan.active(True)
+    if not wlan.isconnected():
+        print("📡 WLAN verbinden...")
+        wlan.connect(WIFI_SSID, WIFI_PASSWORD)
+        timeout = 15
+        while not wlan.isconnected() and timeout > 0:
+            time.sleep(1)
+            timeout -= 1
+    if wlan.isconnected():
+        print("✅ WLAN verbunden:", wlan.ifconfig())
+        return True
+    else:
+        print("⚠ WLAN nicht verbunden, Offline-Modus")
+        return False
 
-                if not json_text or not json_text.startswith(("{","[")):
-                    print("⚠ Ungültiges JSON, übersprungen")
-                    continue
+# ===============================
+# E-Mail senden (mit Cache)
+# ===============================
+def send_email(data):
+    all_data = load_cache()
+    all_data.append(data)
 
-                try:
-                    data_array = json.loads(json_text)
-                    if isinstance(data_array, dict):
-                        data_array = [data_array]
+    if not is_connected():
+        print("⚠ Kein Internet. Speichere im Cache (Gesamt: {})".format(len(all_data)))
+        save_cache(all_data)
+        return
 
-                    if not conn.is_connected():
-                        print("🔄 DB reconnect...")
-                        conn = connect_db()
-                        cursor = conn.cursor()
+    try:
+        print("📧 Versuche {} Messungen zu senden...".format(len(all_data)))
+        smtp = SMTP(
+            SMTP_SERVER,
+            SMTP_PORT,
+            username=SMTP_SENDER_EMAIL,
+            password=SMTP_APP_PASSWORD,
+            ssl=True
+        )
 
-                    for data in data_array:
-                        ts = data.get("timestamp", "")
-                        if "." in ts:
-                            try:
-                                parts = ts.split(" ")
-                                d, m, y = parts[0].split(".")
-                                ts = f"{y}-{m}-{d} {parts[1]}"
-                            except:
-                                ts = ts
+        payload = json.dumps(all_data)
+        msg = (
+            "Subject: {}\r\n"
+            "To: {}\r\n"
+            "From: {}\r\n"
+            "Content-Type: application/json\r\n\r\n{}"
+        ).format(EMAIL_SUBJECT, EMAIL_RECIPIENT, SMTP_SENDER_EMAIL, payload)
 
-                        sql = """
-                        INSERT INTO messungen
-                        (mid, temperatur, feuchte, druck, qualitaet, timestamp)
-                        VALUES (%s, %s, %s, %s, %s, %s)
-                        """
-                        cursor.execute(sql, (
-                            data["mid"],
-                            data["temperatur"],
-                            data["feuchte"],
-                            data["druck"],
-                            data["qualitaet"],
-                            ts
-                        ))
-
-                        # Logdatei pro MID
-                        write_log(data)
-
-                    conn.commit()
-                    print(f"💾 {len(data_array)} Datensätze gespeichert")
-
-                    # Mail löschen
-                    mail.store(num, '+FLAGS', '\\Deleted')
-
-                except Exception as e:
-                    print("❌ Fehler beim JSON/DB Verarbeiten:", e)
-
-            mail.expunge()  # endgültig löschen
-
-        else:
-            print("⏱ Keine neuen Mails")
-
-        mail.logout()
+        smtp.to(EMAIL_RECIPIENT, mail_from=SMTP_SENDER_EMAIL)
+        smtp.send(msg.encode("utf-8"))
+        smtp.quit()
+        print("✅ E-Mail gesendet: {} Messungen".format(len(all_data)))
+        clear_cache()
 
     except Exception as e:
-        print("❌ Fehler beim Abrufen:", e)
+        print("❌ Fehler beim Senden:", e)
+        save_cache(all_data)
 
-    print("⏱ Warte 60 Sekunden...\n")
-    time.sleep(60)
+# ===============================
+# Sensor initialisieren
+# ===============================
+i2c = I2C(0, sda=Pin(4), scl=Pin(5), freq=100000)
+sensor = BME680_I2C(i2c)
+
+# ===============================
+# Start
+# ===============================
+internet = connect_wlan()
+print("▶ Wetterstation gestartet")
+
+# ===============================
+# Hauptschleife
+# ===============================
+while True:
+    if not is_connected():
+        internet = connect_wlan()
+
+    t = time.localtime()
+    timestamp = "{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(
+        t[0], t[1], t[2], t[3], t[4], t[5]
+    )
+
+    data = {
+        "mid": SENSOR_MID,
+        "temperatur": float(sensor.temperature),
+        "feuchte": float(sensor.humidity),
+        "druck": float(sensor.pressure),
+        "qualitaet": float(sensor.gas),
+        "timestamp": timestamp
+    }
+
+    # E-Mail senden / Cache speichern
+    if EMAIL_ENABLED:
+        send_email(data)
+    else:
+        cache = load_cache()
+        cache.append(data)
+        save_cache(cache)
+        print("⚠ Messung in Cache gespeichert (Email deaktiviert)")
+
+    # Messintervall 5 Minuten
+    time.sleep(300)  # 300 Sekunden = 5 Minuten
