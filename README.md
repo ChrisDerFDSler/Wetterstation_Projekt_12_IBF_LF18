@@ -89,7 +89,7 @@ Alle wichtigen Einstellungen werden über eine zentrale Konfigurationsdatei vorg
   - Benutzername
   - Passwort
 
-➡️ Sensible Daten müssen **nicht im Code** geändert werden.
+➡️ Sensible Daten müssen **im Code** geändert werden.
 
 ---
 
