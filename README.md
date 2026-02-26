@@ -102,4 +102,6 @@ Alle wichtigen Einstellungen werden über eine zentrale Konfigurationsdatei vorg
 - Automatischer E-Mail-Versand
 - Praxisnahe Anwendung von Linux-Serverdiensten
 
+Beispiel für den Eintrag in die Datenbank:
+
 <img width="874" height="654" alt="Image" src="https://github.com/user-attachments/assets/0e96f3a1-d20c-46e9-a100-cf40efc60efe" />
