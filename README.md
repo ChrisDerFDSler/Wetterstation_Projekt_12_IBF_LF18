@@ -4,104 +4,155 @@
 ![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi%20Pico%20W-red) ![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi-red) ![Hardware](https://img.shields.io/badge/Hardware-BME680%20Umweltsensor-red)
 
 
-# 🌦️ Wetterstation_Projekt_12_IBF_LF18
 
-**Schulprojekt der FDS Limburg – Klasse 12IBF**  
-**Lernfeld 18 (LF18)**
 
-Dieses Projekt beschreibt den Aufbau einer vernetzten Wetterstation mit Sensordatenerfassung, MQTT-Kommunikation, Datenbankanbindung, Webdarstellung und E-Mail-Versand.
 
----
 
-## 📌 Projektübersicht
+
+
+
+
+
+
+🌦️ Wetterstation_Projekt_12_IBF_LF18
+
+Schulprojekt der FDS Limburg – Klasse 12IBF
+Lernfeld 18 (LF18)
+
+Dieses Projekt beschreibt den Aufbau einer vernetzten Wetterstation mit Sensordatenerfassung, E-Mail-Versand, Datenbankanbindung und Log-Files für jede Sensoreinheit.
+
+📌 Projektübersicht
 
 Die Wetterstation besteht aus zwei Hauptkomponenten:
 
-- **Raspberry Pi / Pi 400**  
-  Zentrale Server-, Speicher- und Auswertungseinheit
-- **Raspberry Pi Pico W (RP2040)**  
-  Sensoreinheit zur Datenerfassung und Übertragung
+Raspberry Pi / Pi 400
+Zentrale Server-, Speicher- und Auswertungseinheit
 
-Die Kommunikation zwischen den Komponenten erfolgt über das **MQTT-Protokoll**.
+Raspberry Pi Pico W (RP2040)
+Sensoreinheit zur Datenerfassung und Übertragung
 
----
+Die Kommunikation erfolgt aktuell über E-Mail / DB-Uploads und nicht mehr nur über MQTT, um den Unterrichtszweck einfacher nachvollziehbar zu machen.
 
-## 🧰 Hardware (Testumgebung)
+🧰 Hardware (Testumgebung)
+Sensor
 
-### Sensor
-- **BME680**
-  - Temperatur
-  - Luftfeuchtigkeit
-  - Luftdruck
-  - Luftqualität (VOC)
+BME680
 
-### Geräte
-- Raspberry Pi 400  
-- Raspberry Pi  
-- Raspberry Pi Pico W (RP2040 mit WLAN)
+Temperatur
 
----
+Luftfeuchtigkeit
 
-## 🖥️ Software & Dienste
+Luftdruck
 
-### Raspberry Pi / Pi 400 (Server)
+Luftqualität (VOC)
 
-#### 🔸 MQTT Broker
-- **Mosquitto**
-  - Zentrale Nachrichtenvermittlung
-  - Publisher: Pico W
-  - Subscriber: Server-Clients
+Geräte
 
-#### 🔸 LAMP-Server (XAMPP auf Linux)
-- **Apache** – Webserver  
-- **MariaDB** – Datenbank  
-- **PHP** – Backend  
-- **phpMyAdmin** – Datenbankverwaltung
+Raspberry Pi 400
 
-#### 🔸 MQTT-Clients (Subscriber)
-- 📧 MQTT-Client für **E-Mail-Versand**
-- 🗄️ MQTT-Client für **Datenbankanbindung**
-- 📊 MQTT-Client für **direkte digitale Darstellung**
-- ✉️ **Mail-Empfang mit Datenbankanbindung**
+Raspberry Pi
 
----
+Raspberry Pi Pico W (RP2040 mit WLAN)
 
-### Raspberry Pi Pico W (RP2040)
+🖥️ Software & Dienste
+Raspberry Pi / Pi 400 (Server)
 
-- 📡 Auslesen des **BME680 Sensors**
-- 📤 Senden der Messdaten an den MQTT-Broker (**Publisher**)
-- 📧 Versand einer E-Mail mit aktuellen Messwerten (optional)
+Datenbankanbindung (MariaDB/MySQL)
+Speicherung aller Messwerte mit Zeitstempel und Sensor-ID (MID)
 
----
+E-Mail-Empfang & Verarbeitung
 
-## ⚙️ Konfigurationsdatei
+Abrufen von Sensormails
 
-Alle wichtigen Einstellungen werden über eine zentrale Konfigurationsdatei vorgenommen.
+Einfügen in die Datenbank
 
-### Enthaltene Konfigurationen:
-- WLAN-Zugangsdaten
-- IP-Adresse des MQTT-Brokers
-- MQTT-Port & Topics
-- E-Mail-Empfänger
-- SMTP-Server-Daten
-  - Serveradresse
-  - Port
-  - Benutzername
-  - Passwort
+Schreiben in individuelle Log-Dateien pro MID
 
-➡️ Sensible Daten müssen **im Code** geändert werden.
+Gelöschte E-Mails nach Verarbeitung
 
----
+Log-Files
 
-## 🎯 Projektziele
+Jede Sensoreinheit (MID) hat eine eigene Log-Datei:
+logs/log_mid_<MID>.txt
 
-- Aufbau einer funktionierenden IoT-Wetterstation
-- Einsatz von MQTT zur Datenübertragung
-- Speicherung von Sensordaten in einer Datenbank
-- Webbasierte Anzeige der Messwerte
-- Automatischer E-Mail-Versand
-- Praxisnahe Anwendung von Linux-Serverdiensten
+Alle historischen Messwerte nachvollziehbar, auch wenn Sensor offline gelöscht wird
 
-Beispiel für den Eintrag in die Datenbank:
+Raspberry Pi Pico W (RP2040)
 
-<img width="874" height="654" alt="Image" src="https://github.com/user-attachments/assets/0e96f3a1-d20c-46e9-a100-cf40efc60efe" />
+Auslesen des BME680 Sensors
+
+Versand der Messwerte per E-Mail an den Server
+
+Offline-Cache bei fehlender Internetverbindung
+
+Automatischer Wieder-Versuch beim nächsten Online-Zyklus
+
+Messintervall aktuell: alle 5 Minuten
+
+Jede Sensoreinheit hat eine feste MID zur Identifikation
+
+⚙️ Konfiguration
+
+Alle wichtigen Einstellungen befinden sich in den Codes selbst.
+
+Sensor-to-Mail Konfiguration (Pico W)
+
+WLAN-Zugang
+
+Sensor-ID (SENSOR_MID)
+
+E-Mail-Versand aktiviert/deaktiviert
+
+SMTP-Server, Port, E-Mail-Adresse und App-Passwort
+
+Cache-Datei für offline gesicherte Messwerte
+
+Mail-to-DB Konfiguration (Server)
+
+IMAP-Server & Zugangsdaten
+
+MySQL-Datenbank-Zugang
+
+Log-Ordner für pro-MID Dateien
+
+Automatisches Löschen der Mails nach Verarbeitung
+
+🎯 Projektziele
+
+Vernetzte IoT-Wetterstation mit zuverlässiger Datenerfassung
+
+Sicherer Datenversand per E-Mail mit Offline-Cache
+
+Speicherung und Auswertung in einer zentralen Datenbank
+
+Historische Daten nachvollziehbar über Log-Dateien
+
+Praxisnahe Anwendung von Serverdiensten, Python-Skripten und Sensorik
+
+📊 Beispiel-Datensatz
+{
+  "mid": 7,
+  "temperatur": 21.5,
+  "feuchte": 45.3,
+  "druck": 1012.4,
+  "qualitaet": 300,
+  "timestamp": "2026-02-26 14:15:00"
+}
+
+✅ Besonderheiten:
+
+Jede MID erzeugt ihre eigene Log-Datei → einfache Nachverfolgung
+
+Offline-Messungen werden zwischengespeichert, bei Internetverbindung automatisch gesendet
+
+E-Mails werden nach Verarbeitung gelöscht → Posteingang bleibt sauber
+
+Wenn du willst, kann ich dir auch noch eine fertige GitHub-Struktur erstellen mit:
+
+sensor_to_email/ (Pico W-Code)
+
+email_to_db/ (Server-Code)
+
+logs/ (leerer Ordner für MID-Dateien)
+
+README.md mit obiger Dokumentation
