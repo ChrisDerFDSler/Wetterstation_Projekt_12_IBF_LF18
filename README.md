@@ -14,122 +14,75 @@
 
 
 
-🌦️ Wetterstation_Projekt_12_IBF_LF18
-
-Schulprojekt der FDS Limburg – Klasse 12IBF
+## 🌦️ **Wetterstation_Projekt_12_IBF_LF18**
+### Schulprojekt der FDS Limburg – Klasse 12IBF
 Lernfeld 18 (LF18)
 
 Dieses Projekt beschreibt den Aufbau einer vernetzten Wetterstation mit Sensordatenerfassung, E-Mail-Versand, Datenbankanbindung und Log-Files für jede Sensoreinheit.
 
-📌 Projektübersicht
-
-Die Wetterstation besteht aus zwei Hauptkomponenten:
-
-Raspberry Pi / Pi 400
-Zentrale Server-, Speicher- und Auswertungseinheit
-
-Raspberry Pi Pico W (RP2040)
-Sensoreinheit zur Datenerfassung und Übertragung
+## 📌 **Projektübersicht**
+### Die Wetterstation besteht aus zwei Hauptkomponenten:
+- Raspberry Pi / Pi 400
+- Zentrale Server-, Speicher- und Auswertungseinheit
+- Raspberry Pi Pico W (RP2040)
+- Sensoreinheit zur Datenerfassung und Übertragung
 
 Die Kommunikation erfolgt aktuell über E-Mail / DB-Uploads und nicht mehr nur über MQTT, um den Unterrichtszweck einfacher nachvollziehbar zu machen.
 
-🧰 Hardware (Testumgebung)
-Sensor
+## 🧰 **Hardware (Testumgebung)**
+### Sensor:
+- BME680
+  - Temperatur
+  - Luftfeuchtigkeit
+  - Luftdruck
+  - Luftqualität (VOC)
+### Geräte:
+- Raspberry Pi Pico W (RP2040 mit WLAN)
 
-BME680
+## 🖥️ **Software & Dienste**
+- Raspberry Pi Pico W (RP2040)
+- Datenbankanbindung
+  -  MariaDB/MySQL
+- Speicherung aller Messwerte mit Zeitstempel und Sensor-ID
+  - MID
+- E-Mail-Empfang & Verarbeitung
+- Abrufen von Sensormails
+  - Einfügen in die Datenbank
+  - Schreiben in individuelle Log-Dateien pro MID
+  - Gelöschte E-Mails nach Verarbeitung
+- Log-Files
+  - Jede Sensoreinheit (MID) hat eine eigene Log-Datei: logs/log_mid_<MID>.txt
+- Alle historischen Messwerte nachvollziehbar, auch wenn Sensor offline gelöscht wird
+- Auslesen des BME680 Sensors
+- Versand der Messwerte per E-Mail an den Server
+- Offline-Cache bei fehlender Internetverbindung
+- Automatischer Wieder-Versuch beim nächsten Online-Zyklus
+- Messintervall Default:
+  - alle 5 Minuten
+- Jede Sensoreinheit hat eine feste MID zur Identifikation
 
-Temperatur
+## ⚙️ **Konfiguration**
+### Alle wichtigen Einstellungen befinden sich in den Codes selbst.
+- Sensor-to-Mail Konfiguration (Pico W)
+- WLAN-Zugang
+- Sensor-ID (SENSOR_MID)
+- E-Mail-Versand aktiviert/deaktiviert
+- SMTP-Server, Port, E-Mail-Adresse und App-Passwort
+- Cache-Datei für offline gesicherte Messwerte
+- Mail-to-DB Konfiguration (Server)
+- IMAP-Server & Zugangsdaten
+- MySQL-Datenbank-Zugang
+- Log-Ordner für pro-MID Dateien
+- Automatisches Löschen der Mails nach Verarbeitung
 
-Luftfeuchtigkeit
+## 🎯 **Projektzielle**
+- Vernetzte IoT-Wetterstation mit zuverlässiger Datenerfassung
+- Sicherer Datenversand per E-Mail mit Offline-Cache
+- Speicherung und Auswertung in einer zentralen Datenbank
+- Historische Daten nachvollziehbar über Log-Dateien
+- Praxisnahe Anwendung von Serverdiensten, Python-Skripten und Sensorik
 
-Luftdruck
-
-Luftqualität (VOC)
-
-Geräte
-
-Raspberry Pi 400
-
-Raspberry Pi
-
-Raspberry Pi Pico W (RP2040 mit WLAN)
-
-🖥️ Software & Dienste
-Raspberry Pi / Pi 400 (Server)
-
-Datenbankanbindung (MariaDB/MySQL)
-Speicherung aller Messwerte mit Zeitstempel und Sensor-ID (MID)
-
-E-Mail-Empfang & Verarbeitung
-
-Abrufen von Sensormails
-
-Einfügen in die Datenbank
-
-Schreiben in individuelle Log-Dateien pro MID
-
-Gelöschte E-Mails nach Verarbeitung
-
-Log-Files
-
-Jede Sensoreinheit (MID) hat eine eigene Log-Datei:
-logs/log_mid_<MID>.txt
-
-Alle historischen Messwerte nachvollziehbar, auch wenn Sensor offline gelöscht wird
-
-Raspberry Pi Pico W (RP2040)
-
-Auslesen des BME680 Sensors
-
-Versand der Messwerte per E-Mail an den Server
-
-Offline-Cache bei fehlender Internetverbindung
-
-Automatischer Wieder-Versuch beim nächsten Online-Zyklus
-
-Messintervall aktuell: alle 5 Minuten
-
-Jede Sensoreinheit hat eine feste MID zur Identifikation
-
-⚙️ Konfiguration
-
-Alle wichtigen Einstellungen befinden sich in den Codes selbst.
-
-Sensor-to-Mail Konfiguration (Pico W)
-
-WLAN-Zugang
-
-Sensor-ID (SENSOR_MID)
-
-E-Mail-Versand aktiviert/deaktiviert
-
-SMTP-Server, Port, E-Mail-Adresse und App-Passwort
-
-Cache-Datei für offline gesicherte Messwerte
-
-Mail-to-DB Konfiguration (Server)
-
-IMAP-Server & Zugangsdaten
-
-MySQL-Datenbank-Zugang
-
-Log-Ordner für pro-MID Dateien
-
-Automatisches Löschen der Mails nach Verarbeitung
-
-🎯 Projektziele
-
-Vernetzte IoT-Wetterstation mit zuverlässiger Datenerfassung
-
-Sicherer Datenversand per E-Mail mit Offline-Cache
-
-Speicherung und Auswertung in einer zentralen Datenbank
-
-Historische Daten nachvollziehbar über Log-Dateien
-
-Praxisnahe Anwendung von Serverdiensten, Python-Skripten und Sensorik
-
-📊 Beispiel-Datensatz
+## 📊 **Beispiel-Datensatz**
 {
   "mid": 7,
   "temperatur": 21.5,
@@ -138,21 +91,3 @@ Praxisnahe Anwendung von Serverdiensten, Python-Skripten und Sensorik
   "qualitaet": 300,
   "timestamp": "2026-02-26 14:15:00"
 }
-
-✅ Besonderheiten:
-
-Jede MID erzeugt ihre eigene Log-Datei → einfache Nachverfolgung
-
-Offline-Messungen werden zwischengespeichert, bei Internetverbindung automatisch gesendet
-
-E-Mails werden nach Verarbeitung gelöscht → Posteingang bleibt sauber
-
-Wenn du willst, kann ich dir auch noch eine fertige GitHub-Struktur erstellen mit:
-
-sensor_to_email/ (Pico W-Code)
-
-email_to_db/ (Server-Code)
-
-logs/ (leerer Ordner für MID-Dateien)
-
-README.md mit obiger Dokumentation
