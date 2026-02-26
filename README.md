@@ -12,7 +12,7 @@
 Dieses Projekt beschreibt den Aufbau einer vernetzten Wetterstation mit Sensordatenerfassung, MQTT-Kommunikation, Datenbankanbindung, Webdarstellung und E-Mail-Versand.
 
 ---
-
+<img width="874" height="654" alt="Image" src="https://github.com/user-attachments/assets/0e96f3a1-d20c-46e9-a100-cf40efc60efe" />
 ## 📌 Projektübersicht
 
 Die Wetterstation besteht aus zwei Hauptkomponenten:
