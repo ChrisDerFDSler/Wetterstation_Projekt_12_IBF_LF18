@@ -1,4 +1,4 @@
-![Status](https://img.shields.io/badge/Status-In Bearbeitung-brightgreen)
+![Status](https://img.shields.io/badge/Status-In-Bearbeitung-brightgreen)
 ![Python](https://img.shields.io/badge/Python-3.x-blue)
 ![IoT](https://img.shields.io/badge/IoT-MQTT-orange)
 ![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi%20Pico%20W-red) ![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi-red) ![Hardware](https://img.shields.io/badge/Hardware-BME680%20Umweltsensor-red)
