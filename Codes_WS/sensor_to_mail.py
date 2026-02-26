@@ -8,16 +8,16 @@ from umail import SMTP
 # ===============================
 # Konfiguration
 # ===============================
-WIFI_SSID = "dd-wrt"
-WIFI_PASSWORD = "54tzck23"
-SENSOR_MID = 10  # eindeutige ID des Sensors
+WIFI_SSID = "WIFI_Namen"
+WIFI_PASSWORD = "WIFI_Password"
+SENSOR_MID = x  # eindeutige ID des Sensors
 EMAIL_ENABLED = True
-SMTP_SERVER = "smtp.gmail.com"
+SMTP_SERVER = "smtp.server"
 SMTP_PORT = 465  # Gmail SSL-Port
-SMTP_SENDER_EMAIL = "wetterstation212ibf@gmail.com"
-SMTP_APP_PASSWORD = "jttmjbowmysroyqq"
-EMAIL_RECIPIENT = "wetter.station.2026@fds-limburg.schule"
-EMAIL_SUBJECT = "Wetterstation BME680 JSON"
+SMTP_SENDER_EMAIL = "Deine_Mail@gmail.com"
+SMTP_APP_PASSWORD = "Password"
+EMAIL_RECIPIENT = "Email_recipient"
+EMAIL_SUBJECT = "Inhalt_der_Mail"
 CACHE_FILE = "cache.json"
 
 # ===============================
@@ -144,4 +144,5 @@ while True:
         print("⚠ Messung in Cache gespeichert (Email deaktiviert)")
 
     # Messintervall 5 Minuten
+
     time.sleep(10)  # 300 Sekunden = 5 Minuten
