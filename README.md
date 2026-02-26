@@ -1,3 +1,9 @@
+![Status](https://img.shields.io/badge/Status-Fertig-brightgreen)
+![Python](https://img.shields.io/badge/Python-3.x-blue)
+![IoT](https://img.shields.io/badge/IoT-MQTT-orange)
+![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi%20Pico%20W-red) ![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi-red) ![Hardware](https://img.shields.io/badge/Hardware-BME680%20Umweltsensor-red)
+
+
 # 🌦️ Wetterstation_Projekt_12_IBF_LF18
 
 **Schulprojekt der FDS Limburg – Klasse 12IBF**  
@@ -96,6 +102,3 @@ Alle wichtigen Einstellungen werden über eine zentrale Konfigurationsdatei vorg
 - Automatischer E-Mail-Versand
 - Praxisnahe Anwendung von Linux-Serverdiensten
 
----
-
-## 📁 Projektstruktur (Beispiel)
