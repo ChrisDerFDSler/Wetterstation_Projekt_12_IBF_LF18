@@ -8,16 +8,16 @@ from umail import SMTP
 # ===============================
 # Konfiguration
 # ===============================
-WIFI_SSID = "WIFI_Namen"
-WIFI_PASSWORD = "WIFI_Password"
+WIFI_SSID = " "
+WIFI_PASSWORD = " "
 SENSOR_MID = x  # eindeutige ID des Sensors
 EMAIL_ENABLED = True
-SMTP_SERVER = "smtp.server"
+SMTP_SERVER = " "
 SMTP_PORT = 465  # Gmail SSL-Port
-SMTP_SENDER_EMAIL = "Deine_Mail@gmail.com"
-SMTP_APP_PASSWORD = "Password"
-EMAIL_RECIPIENT = "Email_recipient"
-EMAIL_SUBJECT = "Inhalt_der_Mail"
+SMTP_SENDER_EMAIL = " "
+SMTP_APP_PASSWORD = " "
+EMAIL_RECIPIENT = " "
+EMAIL_SUBJECT = " "
 CACHE_FILE = "cache.json"
 
 # ===============================
@@ -146,3 +146,4 @@ while True:
     # Messintervall 5 Minuten
 
     time.sleep(10)  # 300 Sekunden = 5 Minuten
+
